@@ -1,5 +1,5 @@
 import { X } from "lucide-react"
-import { Outlet } from "react-router"
+import { Link, Outlet } from "react-router"
 import { Button } from "@/components/ui/button"
 import { ContactList } from "../components/ContactList"
 import { ContactInfo } from "../components/ContactInfo"
@@ -14,7 +14,9 @@ export default function ChatLayout() {
                 <div className="p-4 border-b">
                     <div className="flex items-center gap-2">
                         <div className="h-6 w-6 rounded-full bg-primary" />
-                        <span className="font-semibold">NexTalk</span>
+                        <Link to={'/chat'}>
+                            <span className="font-semibold">NexTalk</span>
+                        </Link>
                     </div>
                 </div>
                 <ContactList />
