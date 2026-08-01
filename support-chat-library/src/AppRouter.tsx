@@ -7,6 +7,9 @@ import { RegisterPage } from "./auth/pages/RegisterPage"
 // import { ChatPage } from "./chat/pages/ChatPage"
 import { Loader } from "./components/Loader"
 import { sleep } from "./lib/sleep"
+import { PrivateRoute } from "./auth/components/PrivateRoute"
+import { useQuery } from "@tanstack/react-query"
+import { checkAuth } from "./fake/fake-data"
 
 
 const ChatLayout = lazy(async () => {
@@ -21,6 +24,30 @@ const NoChatSelectedPage = lazy(() => import("./chat/pages/NoChatSelectedPage"))
 
 
 export const AppRouter = () => {
+
+    const { data: user, isLoading, isError, error } = useQuery({
+        queryKey: ['user'],
+        queryFn: () => {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                throw new Error('No Token found');
+            }
+
+            return checkAuth(token);
+        },
+        retry: 0
+    });
+
+    if (isLoading) {
+        return <Loader />;
+    }
+
+    // if (isError) {
+    //     console.error(error);
+    //     return <Navigate to='/auth' replace />;
+    // }
+
     return (
         <BrowserRouter>
             <Routes>
@@ -33,7 +60,9 @@ export const AppRouter = () => {
                     <Suspense
                         fallback={<Loader />}
                     >
-                        <ChatLayout />
+                        <PrivateRoute isAuthenticated={!!user}>
+                            <ChatLayout />
+                        </PrivateRoute>
                     </Suspense>
                 }>
                     <Route index element={<NoChatSelectedPage />} />
