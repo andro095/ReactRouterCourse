@@ -1,5 +1,5 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { Navigate, redirect } from "react-router";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -8,11 +8,17 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 
+export async function loader() {
+  return redirect('/chat');
+}
+
 export default function Home() {
-  return (
-    <div>
-      <h1 className="text-4xl font-thin">Welcome to the app</h1>
-      <p>Please select a chat</p>
-    </div>
-  );
+  return <Navigate to="/chat" />;
+
+  // return (
+  //   <div>
+  //     <h1 className="text-4xl font-thin">Welcome to the app</h1>
+  //     <p>Please select a chat</p>
+  //   </div>
+  // );
 }
