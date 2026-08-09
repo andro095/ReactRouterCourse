@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink, useParams } from "react-router";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import type { Client } from "../interfaces/chat.interface";
@@ -9,8 +9,7 @@ interface Props {
 
 export const ContactList = ({ clients }: Props) => {
 
-
-
+    const { client_id } = useParams();
 
     return (
         <ScrollArea className="h-[calc(100vh-120px)]">
@@ -22,10 +21,13 @@ export const ContactList = ({ clients }: Props) => {
                             <NavLink
                                 key={client.id}
                                 to={`/chat/client/${client.id}`}
-                                className={({ isActive }) =>
-                                    `w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${isActive
+                                className={({ isActive, isPending }) =>
+                                    `w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 
+                                        ${isActive
                                         ? "bg-secondary text-foreground font-medium shadow-2xs"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                        : isPending
+                                            ? "bg-secondary/30 text-foreground"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                                     }`
                                 }
                                 aria-label="Chat with John Doe"
@@ -33,7 +35,14 @@ export const ContactList = ({ clients }: Props) => {
                                 <div className="h-6 w-6 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex-shrink-0 flex items-center justify-center font-semibold text-xs">
                                     {client.name.split('')[0]}
                                 </div>
-                                <span className="truncate">{client.name}</span>
+                                <span className={`
+                                    ${client_id === client.id
+                                        ? 'text-primary'
+                                        : 'text-muted-foreground'} 
+                                        truncate
+                                    `}>
+                                    {client.name}
+                                </span>
                             </NavLink>
                         ))}
                     </div>

@@ -1,29 +1,35 @@
 import { LogOut, X } from "lucide-react"
-import { Form, Outlet, redirect } from "react-router"
+import { Form, Link, Outlet, redirect } from "react-router"
 import { ContactInformationCard } from "~/chat/components/contact-information-card/ContactInformationCard"
 import { ContactList } from "~/chat/components/ContactList"
 import { Button } from "~/components/ui/button"
-import { getClients } from "~/fake/fake-data"
+import { getClient, getClients } from "~/fake/fake-data"
 import type { Route } from "./+types/chat-layout"
 import { getSession } from "~/sessions.server"
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
     const session = await getSession(request.headers.get('Cookie'));
-    console.log('>> session', session.get('userId'))
+
+    const userName = session.get('name');
+    const { client_id } = params;
 
     if (!session.has('userId')) {
         return redirect('/auth/login');
     }
 
     const clients = await getClients();
-    console.log(clients);
 
-    return { clients };
+    if (client_id) {
+        const client = await getClient(client_id);
+        return { clients, userName, client };
+    }
+
+    return { clients, userName };
 }
 
 const ChatLayout = ({ loaderData }: Route.ComponentProps) => {
 
-    const { clients } = loaderData;
+    const { clients, userName, client } = loaderData;
 
     return (
         <div className="flex h-screen bg-background">
@@ -32,7 +38,7 @@ const ChatLayout = ({ loaderData }: Route.ComponentProps) => {
                 <div className="p-4 border-b">
                     <div className="flex items-center gap-2">
                         <div className="h-6 w-6 rounded-full bg-primary" />
-                        <span className="font-semibold">NexTalk</span>
+                        <Link to="/chat" className="font-semibold">{userName}</Link>
                     </div>
                 </div>
                 <ContactList clients={clients} />
